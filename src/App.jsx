@@ -9,10 +9,42 @@ function App() {
   const [activeTab, setActiveTab] = useState('alcalde'); // 'alcalde' o 'concejo'
   const [selectedRecinto, setSelectedRecinto] = useState('ALL');
   
+  // Timer Lock State
+  const [isLocked, setIsLocked] = useState(true);
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+
   // hook handles fetching and aggregating data
   const { dataAlcalde, dataConcejo, mesasCount, loading } = useElectionData(selectedRecinto);
 
   const escrutadasPct = ((mesasCount / TOTAL_MESAS) * 100).toFixed(1);
+
+  // Timer Logic
+  useEffect(() => {
+    // Exact target time: 2026-03-22 at 20:00:00 BOT (Bolivia Time UTC-4)
+    const target = new Date('2026-03-22T20:00:00-04:00').getTime();
+
+    const calculateTime = () => {
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setIsLocked(false);
+        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft({ hours, minutes, seconds });
+      setIsLocked(true);
+    };
+
+    calculateTime();
+    const timer = setInterval(calculateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Efecto Parallax en el fondo para móviles
   useEffect(() => {
@@ -28,6 +60,49 @@ function App() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  if (isLocked) {
+    return (
+      <>
+        <div className="fixed inset-0 z-[-1] bg-dinamico opacity-90 transition-opacity duration-300" />
+        <div className="min-h-screen flex items-center justify-center p-4 md:p-8 relative">
+          <div className="glass-card max-w-4xl w-full p-8 md:p-14 flex flex-col items-center justify-center text-center space-y-10 animate-[fadeIn_0.5s_ease-out] shadow-2xl border-white/60">
+            <img src="/img/logo.png" alt="Logotipo Conciencia Vinto" className="h-32 md:h-48 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500" />
+            
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark tracking-tight leading-tight">
+              Apertura del sistema: <br className="hidden md:block" />
+              <span className="text-brand">Hoy a las 20:00 (8:00 p. m.)</span>
+            </h1>
+            
+            <p className="text-base md:text-lg font-bold text-gray-700 leading-relaxed max-w-3xl mx-auto bg-white/50 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-200/60 shadow-inner">
+              Esta medida garantiza el ejercicio de un voto libre, evitando cualquier influencia externa en la decisión del electorado y asegurando la transparencia y fiabilidad de la información procesada por <strong className="text-brand-dark font-black tracking-wide">CONCIENCIA VINTEÑA</strong>.
+            </p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mt-8">
+              <div className="bg-brand text-white rounded-[2rem] p-6 md:p-8 w-28 md:w-36 shadow-[0_15px_35px_rgba(27,94,32,0.4)] border-4 border-brand-light transform hover:-translate-y-2 transition-transform duration-300">
+                <span className="block text-5xl md:text-7xl font-black font-mono tracking-tighter drop-shadow-md">{timeLeft.hours.toString().padStart(2, '0')}</span>
+                <span className="block text-[10px] md:text-sm font-bold tracking-widest uppercase mt-3 opacity-90">Horas</span>
+              </div>
+              <span className="text-4xl md:text-6xl font-black text-brand-dark animate-pulse opacity-50 hidden sm:block">:</span>
+              <div className="bg-brand text-white rounded-[2rem] p-6 md:p-8 w-28 md:w-36 shadow-[0_15px_35px_rgba(27,94,32,0.4)] border-4 border-brand-light transform hover:-translate-y-2 transition-transform duration-300">
+                <span className="block text-5xl md:text-7xl font-black font-mono tracking-tighter drop-shadow-md">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                <span className="block text-[10px] md:text-sm font-bold tracking-widest uppercase mt-3 opacity-90">Min</span>
+              </div>
+              <span className="text-4xl md:text-6xl font-black text-brand-dark animate-pulse opacity-50 hidden sm:block">:</span>
+              <div className="bg-brand text-white rounded-[2rem] p-6 md:p-8 w-28 md:w-36 shadow-[0_15px_35px_rgba(27,94,32,0.4)] border-4 border-brand-light transform hover:-translate-y-2 transition-transform duration-300">
+                <span className="block text-5xl md:text-7xl font-black font-mono tracking-tighter drop-shadow-md">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                <span className="block text-[10px] md:text-sm font-bold tracking-widest uppercase mt-3 opacity-90">Seg</span>
+              </div>
+            </div>
+            
+            <p className="text-xs md:text-sm font-black text-gray-500 uppercase tracking-[0.2em] mt-10 opacity-70">
+              Hora Oficial de Bolivia (UTC-4)
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -62,9 +137,9 @@ function App() {
               {escrutadasPct}% mesas escrutadas: {mesasCount}/{TOTAL_MESAS}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-5 overflow-hidden border border-gray-300 shadow-inner">
+          <div className="w-full bg-gray-300 rounded-full h-6 overflow-hidden border border-gray-400/50 shadow-inner">
             <div 
-              className="bg-gradient-to-r from-brand-light to-brand h-5 rounded-full transition-all duration-1000 ease-out relative"
+              className="bg-gradient-to-r from-brand-light to-brand h-6 rounded-full transition-all duration-1000 ease-out relative"
               style={{ width: `${Math.min(escrutadasPct, 100)}%` }}
             >
               <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white/40 to-transparent"></div>
