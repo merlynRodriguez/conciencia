@@ -74,8 +74,9 @@ function App() {
               <span className="text-brand">Hoy a las 20:00 (8:00 p. m.)</span>
             </h1>
             
-            <p className="text-base md:text-lg font-bold text-gray-700 leading-relaxed max-w-3xl mx-auto bg-white/50 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-200/60 shadow-inner">
-              Esta medida garantiza el ejercicio de un voto libre, evitando cualquier influencia externa en la decisión del electorado y asegurando la transparencia y fiabilidad de la información procesada por <strong className="text-brand-dark font-black tracking-wide">CONCIENCIA VINTEÑA</strong>.
+            <p className="text-base md:text-xl font-bold text-brand-dark leading-relaxed max-w-3xl mx-auto bg-white/50 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-200/60 shadow-inner">
+              <strong className="block mb-2 text-xl md:text-2xl uppercase tracking-widest text-[#1B5E20]">Aviso Importante:</strong> 
+              En cumplimiento con las leyes y reglamentos vigentes, el contenido de esta página estará disponible para su visualización a partir de las 20:00 h.
             </p>
             
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mt-8">
