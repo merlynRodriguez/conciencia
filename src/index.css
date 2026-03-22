@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #1b5e20;
+  --color-brand-light: #4c8c4a;
+  --color-brand-dark: #003300;
+}
+
+@layer base {
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    min-height: 100vh;
+    font-family: sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(27, 94, 32, 0.15);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  }
+
+  .bg-dinamico {
+    background-image: url('/img/fondo.png');
+    background-size: auto 100vh;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: var(--scroll-x, 0%) center;
+    background-color: #e8f5e9; /* Light green fallback */
+  }
+
+  @media (min-width: 768px) {
+    .bg-dinamico {
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  }
+}
